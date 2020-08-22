@@ -1,4 +1,7 @@
-use rand::{seq::SliceRandom, {thread_rng, Rng}};
+use rand::{
+    seq::SliceRandom,
+    {thread_rng, Rng},
+};
 use std::collections::HashMap;
 
 type Timeslot = String;
@@ -47,19 +50,19 @@ impl Schedule {
                 let mut rng = thread_rng();
                 let station = rng.gen_range(0, stations_len);
                 let timeslot = rng.gen_range(0, timeslots_len);
-                if retries > 1000 {
+                if retries > (stations_len * timeslots_len) * 5 {
                     self.unassigned.push(i.clone());
                     break;
                 }
-                
+
                 let slot = self
-                .schedule
-                .values_mut()
-                .nth(station)
-                .expect("Error, invalid station generated")
-                .values_mut()
-                .nth(timeslot)
-                .expect("Error, invalid timeslot generated");
+                    .schedule
+                    .values_mut()
+                    .nth(station)
+                    .expect("Error, invalid station generated")
+                    .values_mut()
+                    .nth(timeslot)
+                    .expect("Error, invalid timeslot generated");
                 if slot.is_none() {
                     *slot = Some(i.clone());
                     assigned = true;
@@ -75,7 +78,11 @@ impl Schedule {
         for (station_name, timeslots) in self.schedule.iter() {
             output += &format!("[Station: {}]\n", station_name);
             for (timeslot, individual) in timeslots.iter() {
-                output += &format!("{}: {}\n", timeslot, if let Some(i) = individual { i } else { "None" });
+                output += &format!(
+                    "{}: {}\n",
+                    timeslot,
+                    if let Some(i) = individual { i } else { "None" }
+                );
             }
             output += "\n";
         }
@@ -98,20 +105,32 @@ enum ParseMode {
 }
 
 fn main() {
-    let input = std::fs::read_to_string("input.txt").expect("Failed to open and read \"input.txt\"");
+    let input =
+        std::fs::read_to_string("input.txt").expect("Failed to open and read \"input.txt\"");
 
     let mut stations = Vec::<Station>::new();
     let mut timeslots = Vec::<Timeslot>::new();
     let mut individuals = Vec::<Individual>::new();
-    
+
     let mut mode = ParseMode::None;
     for line in input.lines() {
-        if line.is_empty() { continue }
+        if line.is_empty() {
+            continue;
+        }
         match &*line.to_lowercase() {
-            "[stations]" => { mode = ParseMode::Stations; continue }
-            "[timeslots]" | "[times]" => { mode = ParseMode::Timeslots; continue }
-            "[individuals]" | "[people]" => { mode = ParseMode::Individuals; continue }
-            _ => ()
+            "[stations]" => {
+                mode = ParseMode::Stations;
+                continue;
+            }
+            "[timeslots]" | "[times]" => {
+                mode = ParseMode::Timeslots;
+                continue;
+            }
+            "[individuals]" | "[people]" => {
+                mode = ParseMode::Individuals;
+                continue;
+            }
+            _ => (),
         }
         match mode {
             ParseMode::None => (),
@@ -120,9 +139,9 @@ fn main() {
             ParseMode::Individuals => individuals.push(line.to_string()),
         }
     }
-    
+
     let mut schedule = Schedule::new(&stations, &timeslots);
-    
+
     let mut rng = thread_rng();
     individuals.shuffle(&mut rng);
     schedule.assign_individuals(&individuals);
