@@ -1,0 +1,29 @@
+[Stations]
+1
+2
+3
+
+[Timeslots]
+07:00-12:00
+12:00-17:00
+17:00-22:00
+22:00-02:00
+02:00-07:00
+
+[Individuals]
+Bill
+Joe
+Sam
+That guy
+Guy 1
+Guy 2
+Guy 3
+Guy 4
+Guy 5
+Guy 6
+Tyrone
+Max
+Ethan
+Person
+Guy 7
+Eric
